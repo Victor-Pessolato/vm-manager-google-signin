@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>VMs Manager</title>
+  <title>GCE Instances Manager</title>
   <meta name="google-signin-client_id" content="{{ gsignin_key }}">
 
   <script src="https://apis.google.com/js/platform.js" async defer></script>
@@ -11,27 +11,31 @@
   <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="javascript:void(0)">GCE Instances Manager</a>
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-<h1>VMs Manager</h1>
+  <div class="collapse navbar-collapse" id="navb">
+    <div class="mr-auto">
+        
+    </div>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <span class="nav-link" href="javascript:void(0)">Link</span>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link" href="javascript:void(0)">Link</span>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link disabled" href="javascript:void(0)">Disabled</span>
+      </li>
+    </ul>
+    <div id="gsignin_btn" class="g-signin2" data-onsuccess="onSignIn" style="display: none"></div>
+  </div>
+</nav>
 
-<div class="g-signin2" data-onsuccess="onSignIn"></div>
-
-<div id="login-info">
-  <h2>Login info:</h2>
-  {% if user_data %}
-    <dl>
-      <dt>Name</dt>
-      <dd>{{ user_data['name'] }}</dd>
-      
-      <dt>Email</dt>
-      <dd>{{ user_data['email'] }}</dd>
-      
-      <dt>Last 10 visits</dt>
-    </dl>
-  {% else %}
-    <p>Error: No user data</p>
-  {% endif %}
-</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -42,7 +46,11 @@
             token: id_token
         };        
         $.post("/checktoken", data, function(res) {
-            console.log(res);
+            if(res.sub) {
+                console.log(res);
+            } else {
+                console.error("not a valid user");
+            }
         });
     }
 
@@ -52,8 +60,7 @@
     }
 
     if (auth2.isSignedIn.get()) {
-        let id_token = googleUser.getAuthResponse().id_token;
-        checkLoginUser(id_token);
+        onSignIn(googleUser);
     }
 </script>
 </body>

@@ -1,4 +1,4 @@
 window.addEventListener('load', function () {
-    console.log("hello");
+    console.log("123");
 });
 

@@ -27,9 +27,9 @@ def check_token():
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
 
-        userid = idinfo['sub']
+        user_info = idinfo
 
-        return jsonify(userid)
+        return jsonify(user_info)
 
     except ValueError:
         return 'error', 401
