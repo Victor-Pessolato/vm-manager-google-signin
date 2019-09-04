@@ -1,38 +1,27 @@
-import os
+from modules import auth
 
-from flask import Flask, render_template, request, jsonify
-from google.auth.transport import requests
-from google.oauth2 import id_token
-
-firebase_request_adapter = requests.Request()
+from flask import Flask, render_template, request, jsonify, session
+from flask_session import Session
 
 app = Flask(__name__)
-google_signin_key = os.environ['GOOGLE_SIGNIN_KEY']
+
+# Set the configuration for a server-side session
+app.config.from_object(__name__)
+Session(app)
 
 
 @app.route('/')
 def root():
-    return render_template('index.html', gsignin_key=google_signin_key)
+    return render_template('index.html', gsignin_key=auth.google_signin_key)
 
 
-@app.route('/checktoken', methods=['POST'])
-def check_token():
-    try:
-        token = request.form['token']
-        idinfo = id_token.verify_oauth2_token(
-            token,
-            requests.Request(),
-            google_signin_key)
-
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-            raise ValueError('Wrong issuer.')
-
-        user_info = idinfo
-
-        return jsonify(user_info)
-
-    except ValueError:
-        return 'error', 401
+@app.route('/get-user-data', methods=['GET'])
+def get_user_data():
+    user_info = auth.check_token(request)
+    if user_info:
+        return render_template('partials/user_info.html', user_info=user_info)
+    else:
+        return jsonify({'message': 'error'}), 401
 
 
 if __name__ == '__main__':
