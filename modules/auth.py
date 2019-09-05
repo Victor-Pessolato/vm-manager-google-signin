@@ -1,11 +1,10 @@
 from flask import session
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from google.cloud import datastore
+
+from modules import user_manager
 
 google_signin_key = None
-
-client = datastore.Client()
 
 
 def identify(token):
@@ -21,12 +20,11 @@ def identify(token):
     return idinfo
 
 
-def authorize(user_data):
-    query = client.query(kind='AllowedUsers')
-    query.add_filter('email', '=', user_data['email'])
-    is_allowed = next(iter(query.fetch()), None)
+def authorize(user_info):
+    is_allowed = user_manager.is_allowed(user_info['email'])
+
     if is_allowed:
-        return user_data
+        return user_info
     else:
         return False
 
@@ -48,9 +46,8 @@ def authenticate(request):
             # We store user's info in the session
             session['user_info'] = user_info
 
-            # We store is in the DB
-            # TODO - Store user data in the DB
-
+        # We store is in the DB
+        user_manager.store_visitor(user_info)
         # And checks if user is authorized to proceed
         return authorize(user_info)
 
