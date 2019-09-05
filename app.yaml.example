@@ -14,3 +14,4 @@ handlers:
 
 env_variables:
   GOOGLE_SIGNIN_KEY: '<Key for the Google Sign In API>'
+  SESSION_SECRET_KEY: '<Key for the Flask Session Cookie Generator>'

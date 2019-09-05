@@ -14,7 +14,8 @@ def identify(token):
                 requests.Request(),
                 google_signin_key)
 
-    if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+    allowed_types = ['accounts.google.com', 'https://accounts.google.com']
+    if idinfo['iss'] not in allowed_types:
         raise ValueError('Wrong issuer.')
 
     return idinfo
@@ -22,19 +23,12 @@ def identify(token):
 
 def authorize(user_data):
     query = client.query(kind='AllowedUsers')
-    query.projection = ['email']
-    allowed_users = list(query.fetch())
-    print(allowed_users)
-    """
-    key = client.key('User', user_data['email'])
-    is_allowed = client.get(key)
-
+    query.add_filter('email', '=', user_data['email'])
+    is_allowed = next(iter(query.fetch()), None)
     if is_allowed:
-        return True
+        return user_data
     else:
         return False
-    """
-    return user_data
 
 
 def authenticate(request):
@@ -44,11 +38,20 @@ def authenticate(request):
         if user_session:
             user_info = user_session
         else:
-            # If there is no user session, we check if the token is from a valid user.
+            # If there is no user session,
+            # we check if the token is from a valid user.
             token = request.headers.get('X-User-Token')
+
+            # Here we look for the user's identity
             user_info = identify(token)
+
+            # We store user's info in the session
             session['user_info'] = user_info
 
+            # We store is in the DB
+            # TODO - Store user data in the DB
+
+        # And checks if user is authorized to proceed
         return authorize(user_info)
 
     except ValueError:
