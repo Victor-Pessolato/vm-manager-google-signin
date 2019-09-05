@@ -27,29 +27,48 @@
 		</div>
 	</nav>
 
-    <main class="container-fluid">
-        <div class="row">
-            <div id="main-workspace" class="col-12 d-flex justify-content-center align-items-center" style="min-height: 90vh">
-                <div class="text-center">
-                    <h2>Hello!</h2>
-                    <h4>You will be able to see the information once you signin with your account.</h4>
-                    <h4>If you already signed in, wait a moment so we can check who you are..</h4>
-                </div>
-            </div>    
-        </div>    
-    </main>
+	<main class="container-fluid">
+		<div class="row">
+			<div id="main-workspace" class="col-12 d-flex justify-content-center align-items-center"
+				style="min-height: 90vh">
+				<div class="text-center">
+					<h2>Hello!</h2>
+					<h4>You will be able to see the information once you signin with your account.</h4>
+					<h4>If you already signed in, wait a moment so we can check who you are..</h4>
+				</div>
+			</div>
+		</div>
+	</main>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script>
-	// Checks if the user logged in is valid.
-    function loadApp(id_token) {
+    
+    function get_instances(id_token) {
+        $.ajax({
+            url: '/instances',
+            headers: { 'x-user-token': id_token }
+        }).done(function(data) {
+            console.log(data);
+        });
+    }
+
+    function get_user_data(id_token) {
         $.ajax({
             url: '/get-user-data',
             headers: { 'x-user-token': id_token }
         }).done(function(data) {
             $("#nav_user_info").html(data);
         });
+    }
+
+	// Checks if the user logged in is valid.
+    function loadApp(id_token) {
+        // Load user data
+        get_user_data(id_token);
+
+        // Load instances data
+        get_instances(id_token);
     }
 
     // Callback for when the user sign in from the web and when we do the first check.
