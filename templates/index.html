@@ -48,7 +48,7 @@
             url: '/get-user-data',
             headers: { 'x-user-token': id_token }
         }).done(function(data) {
-            console.log(data);
+            $("#nav_user_info").html(data);
         });
     }
 
@@ -56,6 +56,22 @@
     function onSignIn(googleUser) {
         let id_token = googleUser.getAuthResponse().id_token;
         loadApp(id_token);
+    }
+
+    // Sign out function from The Google Signin API
+    function signOut() {
+        let auth2 = gapi.auth2.getAuthInstance();
+        let googleUser = auth2.currentUser.get();
+
+        $.ajax({
+            url: '/sign-out',
+            headers: { 'x-user-token': googleUser.getAuthResponse().id_token }
+        }).done(function(data) {
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+                location.reload();
+            });
+        });
     }
 
     // If user is already logged in the browser we check if it's a valid user and if it is registered in our DB

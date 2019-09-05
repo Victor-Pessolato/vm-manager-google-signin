@@ -1,12 +1,11 @@
-
 <ul class="navbar-nav mr-auto">
-	<li class="nav-item">
-		<span class="nav-link" href="javascript:void(0)">Link</span>
-	</li>
-	<li class="nav-item">
-		<span class="nav-link" href="javascript:void(0)">Link</span>
-	</li>
-	<li class="nav-item">
-		<span class="nav-link disabled" href="javascript:void(0)">Disabled</span>
+	<li class="nav-item dropdown">
+		<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+			{{ user_info['name'] }}
+		</a>
+		<div class="dropdown-menu dropdown-menu-right">
+			<span class="dropdown-item">{{ user_info['email'] }}</span>
+            <a class="dropdown-item" href="#" onclick="signOut();">Sign out</a>
+		</div>
 	</li>
 </ul>

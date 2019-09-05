@@ -53,3 +53,11 @@ def authenticate(request):
 
     except ValueError:
         return False
+
+
+def sing_out():
+    try:
+        session.pop('user_info', None)
+        return True
+    except ValueError:
+        return False
