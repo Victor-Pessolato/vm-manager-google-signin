@@ -37,7 +37,9 @@ def sign_out():
 def get_zones():
     user_info = auth.authenticate(request)
     if user_info:
-        zones = compute.list_zones()
+        # zones = compute.list_zones()
+        # Uncomment in case I want to check for all the zones
+        zones = [{'name': 'us-central1-a'}]
         zone_count = len(zones)
         return jsonify({'zones': zones, 'zone_count': zone_count})
     else:
@@ -51,6 +53,7 @@ def get_instances(zone):
         instances = compute.list_instances(zone)
 
         if instances:
+            # print(instances[0])
             return render_template(
                 'partials/instances.html', instances=instances, zone=zone)
         else:
