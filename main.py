@@ -33,12 +33,22 @@ def sign_out():
         return jsonify({'message': 'error'}), 400
 
 
+@app.route('/zones', methods=['GET'])
+def get_zones():
+    user_info = auth.authenticate(request)
+    if user_info:
+        zones = compute.list_zones()
+        zone_count = len(zones)
+        return jsonify({'zones': zones, 'zone_count': zone_count})
+    else:
+        return jsonify({'message': 'error'}), 401
+
+
 @app.route('/instances', methods=['GET'])
 def get_instances():
     user_info = auth.authenticate(request)
     if user_info:
         zones = compute.list_zones()
-        instances = []
         for i in zones:
             zone_inst = compute.list_instances(i['name'])
             print(zone_inst)

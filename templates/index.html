@@ -10,6 +10,12 @@
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<style>
+		.spinner-border-lg {
+			width: 4rem;
+			height: 4rem;
+		}
+	</style>
 </head>
 
 <body>
@@ -29,7 +35,7 @@
 
 	<main class="container-fluid">
 		<div class="row">
-			<div id="main-workspace" class="col-12 d-flex justify-content-center align-items-center"
+			<div id="main-workspace" class="col-12 d-flex justify-content-center align-items-center flex-wrap"
 				style="min-height: 90vh">
 				<div class="text-center">
 					<h2>Hello!</h2>
@@ -43,13 +49,27 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script>
-    
-    function get_instances(id_token) {
+		function get_instances(id_token) {
+        $_workspace = $("#main-workspace");
+        $_workspace.html(`<div class="spinner-border spinner-border-lg"></div>`);
         $.ajax({
-            url: '/instances',
+
+            url: '/zones',
             headers: { 'x-user-token': id_token }
+
         }).done(function(data) {
-            console.log(data);
+            if(data.zone_count > 0) {
+                for (zone of data.zones) {
+                    $.ajax({
+                        url: '/instances/' + zone.name,
+                        headers: { 'x-user-token': id_token }
+                    }).done(function(data) {
+                        console.log(data);
+                    });    
+                }
+            } else {
+                $_workspace.html(`<h2 class="text-center">An error occured when trying to fetch GPC zones</h2>`);
+            }
         });
     }
 

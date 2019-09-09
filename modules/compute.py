@@ -12,10 +12,3 @@ def list_instances(zone):
 def list_zones():
     result = compute.zones().list(project=project).execute()
     return result['items'] if 'items' in result else None
-
-
-"""
-def list_instances(project, zone):
-    result = compute.instances().list(project=project, zone=zone).execute()
-    return result['items'] if 'items' in result else None
-"""
