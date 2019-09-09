@@ -49,40 +49,46 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script>
-		function get_instances(id_token) {
-            $_workspace = $("#main-workspace");
-            $_workspace.html(`<div class="spinner-border spinner-border-lg"></div>`);
-            $.ajax({
+        
 
+        function getInstances(id_token) {
+            $_workspace = $("#main-workspace");
+            $_workspace.html(`<div id="workspace-spinner" class="spinner-border spinner-border-lg"></div>`);
+            $.ajax({
                 url: '/zones',
                 headers: { 'x-user-token': id_token }
-
             }).done(function(data) {
                 if(data.zone_count > 0) {
-                    let i = 0;
-                    for (zone of data.zones) {
-                        let zoneName = zone.name;
-                        let x = i * 1000;
-                        i++;
-                        
-                        setTimeout(function() {
-                            // Using a setTimeout to avoid blocking too many simultanious requests
+                    function getInstanceByZone() {
+                        let zone = data.zones.pop();
+                        console.log(zone);
+                        if(zone) {
                             $.ajax({
-                                url: '/instances/' + zoneName,
+                                url: '/instances/' + zone.name,
                                 headers: { 'x-user-token': id_token }
                             }).done(function(data) {
-                                console.log(data);
+                                // Display data
+                                if(!data.message) {
+                                    $_workspace.prepend(data);
+                                }                            
+                                // Continue handling the queue 
+                                getInstanceByZone();                            
                             });
-
-                        }, x);
+                        } else {
+                            $("#workspace-spinner").fadeOut();
+                        }
                     }
+
+                    getInstanceByZone();
+
                 } else {
                     $_workspace.html(`<h2 class="text-center">An error occured when trying to fetch GPC zones</h2>`);
                 }
+
             });
     }
 
-    function get_user_data(id_token) {
+    function getUserData(id_token) {
         $.ajax({
             url: '/get-user-data',
             headers: { 'x-user-token': id_token }
@@ -94,10 +100,10 @@
 	// Checks if the user logged in is valid.
     function loadApp(id_token) {
         // Load user data
-        get_user_data(id_token);
+        getUserData(id_token);
 
         // Load instances data
-        get_instances(id_token);
+        getInstances(id_token);
     }
 
     // Callback for when the user sign in from the web and when we do the first check.

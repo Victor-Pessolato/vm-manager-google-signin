@@ -49,12 +49,10 @@ def get_instances(zone):
     user_info = auth.authenticate(request)
     if user_info:
         instances = compute.list_instances(zone)
-        count = len(instances)
 
-        if count > 0:
-            return jsonify({'instances': instances})
-            # return render_template(
-            #     'partials/instances.html', instances, zone)
+        if instances:
+            return render_template(
+                'partials/instances.html', instances=instances, zone=zone)
         else:
             return jsonify({'message': 'empty zone'})
     else:
