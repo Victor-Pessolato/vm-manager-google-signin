@@ -116,9 +116,10 @@
 
         confirm(confirmer) {
             let zone = this.zone;
+            let $_caller = this.$_caller;
             this["$_confirmer"] = $(confirmer);
             if (this.$_confirmer.hasClass('disabled') == false) {
-                this.$_caller.addClass("disabled");
+                $_caller.addClass("disabled");
                 requestManager.makeRequest({
                     method: "POST",
                     url: `/instances/${this.action}`,
@@ -128,7 +129,9 @@
                     }
                 }, function(data) {
                     if(data.id) {
+                        console.log(this);
                         ui.removeSpinner(confirmer);
+                        ui.addSpinner($_caller);
                         $("#confirm_modal").modal('hide');
                         requestManager.checkOnRequest(zone, data.id, app.updateInstance);
                     }
@@ -139,6 +142,10 @@
     };
     
     const ui = {
+        addSpinner($_target) {
+            $_target.html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+        },
+
         addSpinnerToButton(target) {
             $_target = $(target);
             $_spinner = $_target.children(".spinner-border");
@@ -204,7 +211,7 @@
         },
         // Updates UI information after tracking progress of a operation
         updateInstance(data) {
-            console.log(data);
+            $(`#${data.targetId}`).load(`/instances/${data.targetId}`);
         }
     };
 
