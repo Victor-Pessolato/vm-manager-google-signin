@@ -73,6 +73,16 @@
 	<script src="{{ url_for('static', filename='script.js') }}"></script>
 	<script>
 	
+    const requestManager = {
+        id_token: null,
+        makeRequest(options, callback) {
+            options['x-user-token'] = this.id_token;
+            $.ajax(options).done(function(data) {
+                callback(data);
+            });
+        }
+    };
+
     function openModal(action) {
         let confirmText = `Are you sure you wish to ${action} this GCE instance?`;
         let confirmActions = `<button class="btn btn-light btn-sm" data-dismiss="modal">CANCEL</button><button class="btn btn-info btn-sm font-weight-bold" onclick="requestAction(this)">${action.toUpperCase()}</button>`;
@@ -100,21 +110,16 @@
         $_target.addClass('disabled');
     }
 
-    function getInstances(id_token) {
+    function getInstances() {
         $_workspace = $("#main-workspace");
         $_workspace.html(`<div id="workspace-spinner" class="spinner-border spinner-border-lg"></div>`);
-        $.ajax({
-            url: '/zones',
-            headers: { 'x-user-token': id_token }
-        }).done(function(data) {
+
+        requestManager.makeRequest({url: '/zones'}, function(data) {
             if(data.zone_count > 0) {
                 function getInstanceByZone() {
                     let zone = data.zones.pop();
                     if(zone) {
-                        $.ajax({
-                            url: '/instances/' + zone.name,
-                            headers: { 'x-user-token': id_token }
-                        }).done(function(data) {
+                        requestManager.makeRequest({url: '/instances/' + zone.name}, function(data) {
                             // Display data
                             if(!data.message) {
                                 $_workspace.prepend(data);
@@ -132,43 +137,36 @@
             } else {
                 $_workspace.html(`<h2 class="text-center">An error occured when trying to fetch GPC zones</h2>`);
             }
-
         });
+        
     }
 
-    function getUserData(id_token) {
-        $.ajax({
-            url: '/get-user-data',
-            headers: { 'x-user-token': id_token }
-        }).done(function(data) {
+    function getUserData() {
+        let options = {url: '/get-user-data'};
+        requestManager.makeRequest(options, function(data) {
             $("#nav_user_info").html(data);
         });
     }
 
 	// Checks if the user logged in is valid.
-    function loadApp(id_token) {
+    function loadApp() {
         // Load user data
-        getUserData(id_token);
+        getUserData();
 
         // Load instances data
-        getInstances(id_token);
+        getInstances();
     }
 
     // Callback for when the user sign in from the web and when we do the first check.
     function onSignIn(googleUser) {
-        let id_token = googleUser.getAuthResponse().id_token;
-        loadApp(id_token);
+        requestManager.id_token = googleUser.getAuthResponse().id_token;
+        loadApp();
     }
 
     // Sign out function from The Google Signin API
     function signOut() {
         let auth2 = gapi.auth2.getAuthInstance();
-        let googleUser = auth2.currentUser.get();
-
-        $.ajax({
-            url: '/sign-out',
-            headers: { 'x-user-token': googleUser.getAuthResponse().id_token }
-        }).done(function(data) {
+        requestManager.makeRequest({url: '/sign-out'}, function(data) {
             auth2.signOut().then(function () {
                 console.log('User signed out.');
                 location.reload();
