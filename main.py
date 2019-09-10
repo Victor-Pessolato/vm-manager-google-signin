@@ -53,7 +53,6 @@ def get_instances(zone):
         instances = compute.list_instances(zone)
 
         if instances:
-            # print(instances[0])
             return render_template(
                 'partials/instances.html', instances=instances, zone=zone)
         else:
@@ -62,14 +61,17 @@ def get_instances(zone):
         return jsonify({'message': 'error'}), 401
 
 
-@app.route('/instances/<instance>/<action>', methods=['GET'])
-def update_instance(instance, action):
+@app.route('/instances/<action>', methods=['POST'])
+def update_instance(action):
     user_info = auth.authenticate(request)
     if user_info:
+        vm = request.form['instance']
+        zone = request.form['zone']
+
         if action == 'start':
-            return jsonify(compute.start_vm('us-central1-a', instance))
+            return jsonify(compute.start_vm(zone, vm))
         else:
-            return jsonify(compute.stop_vm('us-central1-a', instance))
+            return jsonify(compute.stop_vm(zone, vm))
 
     else:
         return jsonify({'message': 'error'}), 401

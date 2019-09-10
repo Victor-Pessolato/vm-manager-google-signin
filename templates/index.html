@@ -76,7 +76,7 @@
     const requestManager = {
         id_token: null,
         makeRequest(options, callback) {
-            options['x-user-token'] = this.id_token;
+            options['headers'] = {'x-user-token': this.id_token};
             $.ajax(options).done(function(data) {
                 callback(data);
             });
@@ -87,10 +87,17 @@
         $_caller = $(caller);
         let action = $_caller.attr("data-action");
         let targetVM = $_caller.attr("data-vm");
+        let zone = $_caller.attr("data-zone");
 
         $("#confirm_text").html(`Are you sure you wish to ${action} <b>${targetVM}</b>?`);
-        $("#confirm_actions").html(`<button class="btn btn-light btn-sm" data-dismiss="modal">CANCEL</button>` + 
-        `<button class="btn btn-info btn-sm font-weight-bold" data-action="${action}" data-vm="${targetVM}" onclick="requestAction(this)">${action.toUpperCase()}</button>`);
+        $("#confirm_actions").html(`
+            <button class="btn btn-light btn-sm" data-dismiss="modal">
+                CANCEL
+            </button>
+            <button class="btn btn-info btn-sm font-weight-bold" data-action="${action}" 
+                data-vm="${targetVM}" data-zone="${zone}" onclick="requestAction(this)">
+                ${action.toUpperCase()}
+            </button>`);
 
         $("#confirm_modal").modal('show');
     }
@@ -100,9 +107,15 @@
         if ($_caller.hasClass('disabled') == false) {
             let action = $_caller.attr("data-action");
             let targetVM = $_caller.attr("data-vm");
+            let zone = $_caller.attr("data-zone");
 
             requestManager.makeRequest({
-                url: `/instances/${targetVM}/${action}`
+                method: "POST",
+                url: `/instances/${action}`,
+                data: {
+                    instance: targetVM,
+                    zone: zone
+                }
             }, function(data) {
                 console.log(data);
             });
@@ -118,7 +131,7 @@
         } else {
             $_spinner.show();
         }
-        $_target.addClass('disabled');
+        $_target.addClass("disabled");
     }
 
     function getInstances() {

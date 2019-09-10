@@ -8,10 +8,12 @@
 				Status:
 				{% if instance.status == 'RUNNING' %}
                     <span class="badge badge-success">{{ instance.status }}</span>
-                    <button class="btn btn-danger btn-sm btn-action" onclick="openModal(this)" data-action="stop" data-vm="{{ instance.name }}" data-toggle="tooltip" title="Stop"><i class="fa fa-stop"></i></button>
+                    <button class="btn btn-danger btn-sm btn-action" onclick="openModal(this)" data-action="stop"
+                            data-vm="{{ instance.name }}" data-toggle="tooltip" data-zone="{{ zone }}" title="Stop"><i class="fa fa-stop"></i></button>
 				{% else %}
                     <span class="badge badge-danger">{{ instance.status }}</span>
-                    <button class="btn btn-success btn-sm btn-action" onclick="openModal(this)" data-action="start" data-vm="{{ instance.name }}" data-toggle="tooltip" title="Start"><i class="fas fa-play"></i></button>
+                    <button class="btn btn-success btn-sm btn-action" onclick="openModal(this)" data-action="start" 
+                            data-vm="{{ instance.name }}" data-toggle="tooltip" data-zone="{{ zone }}" title="Start"><i class="fas fa-play"></i></button>
 				{% endif %}
 			</div>
 			{% endfor %}
