@@ -3,7 +3,9 @@
 		<div class="card-header text-uppercase">{{ zone }}</div>
 		<div class="card-body">
 			{% for instance in instances %}
-                {% include 'partials/instance.html' %}
+                <div id="{{ instance.id }}" class="pos-rel border border-light rounded text-left p-2">
+                    {% include 'partials/instance.html' %}
+                </div>
 			{% endfor %}
 		</div>
 	</div>

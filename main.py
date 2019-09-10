@@ -46,6 +46,21 @@ def get_zones():
         return jsonify({'message': 'error'}), 401
 
 
+@app.route('/instances/<zone>/<id>', methods=['GET'])
+def get_instance(zone, id):
+    user_info = auth.authenticate(request)
+    if user_info:
+        instance = compute.get_instance(zone, id)
+
+        if instance:
+            return render_template(
+                'partials/instance.html', instance=instance, zone=zone)
+        else:
+            return jsonify({'message': 'empty zone'})
+    else:
+        return jsonify({'message': 'error'}), 401
+
+
 @app.route('/instances/<zone>', methods=['GET'])
 def get_instances(zone):
     user_info = auth.authenticate(request)

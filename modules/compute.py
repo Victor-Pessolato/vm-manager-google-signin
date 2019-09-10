@@ -4,6 +4,12 @@ compute = build('compute', 'v1')
 project = 'test-project-pessolato-251712'
 
 
+def get_instance(zone, id):
+    result = compute.instances().get(
+        project=project, zone=zone, instance=id).execute()
+    return result
+
+
 def list_instances(zone):
     result = compute.instances().list(project=project, zone=zone).execute()
     return result['items'] if 'items' in result else None

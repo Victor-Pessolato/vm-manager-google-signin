@@ -129,7 +129,6 @@
                     }
                 }, function(data) {
                     if(data.id) {
-                        console.log(this);
                         ui.removeSpinner(confirmer);
                         ui.addSpinner($_caller);
                         $("#confirm_modal").modal('hide');
@@ -211,7 +210,9 @@
         },
         // Updates UI information after tracking progress of a operation
         updateInstance(data) {
-            $(`#${data.targetId}`).load(`/instances/${data.targetId}`);
+            let x = data.zone.lastIndexOf("/");
+            let zone = data.zone.substring(x + 1);
+            $(`#${data.targetId}`).load(`/instances/${zone}/${data.targetId}`);
         }
     };
 
