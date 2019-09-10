@@ -77,5 +77,14 @@ def update_instance(action):
         return jsonify({'message': 'error'}), 401
 
 
+@app.route('/operations/<zone>/<operation>', methods=['GET'])
+def get_operation(zone, operation):
+    user_info = auth.authenticate(request)
+    if user_info:
+        return jsonify(compute.get_op(zone, operation))
+    else:
+        return jsonify({'message': 'error'}), 401
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

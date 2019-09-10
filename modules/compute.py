@@ -24,3 +24,9 @@ def stop_vm(zone, vm):
     result = compute.instances().stop(
         project=project, zone=zone, instance=vm).execute()
     return result
+
+
+def get_op(zone, operation):
+    result = compute.zoneOperations().get(
+        project=project, zone=zone, operation=operation).execute()
+    return result

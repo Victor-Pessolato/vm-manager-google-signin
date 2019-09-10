@@ -102,6 +102,16 @@
         $("#confirm_modal").modal('show');
     }
 
+    function checkOnAction(zone, operationID) {
+        let handle = setInterval(function() {
+            requestManager.makeRequest({url: `/operations/${zone}/${operationID}`}, function(data) {
+                if(data.status === "DONE") {
+                    clearInterval(handle);
+                }
+            });
+        },1000);
+    }
+
     function requestAction(caller) {
         let $_caller = $(caller);
         if ($_caller.hasClass('disabled') == false) {
@@ -117,7 +127,9 @@
                     zone: zone
                 }
             }, function(data) {
-                console.log(data);
+                if(data.id) {
+                    checkOnAction(zone, data.id);
+                }
             });
         }
         addSpinnerToButton(caller);
