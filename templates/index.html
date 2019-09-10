@@ -58,7 +58,7 @@
 	</main>
 
     <div class="modal fade" id="confirm_modal">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div id="confirm_text" class="modal-body"></div>
 
@@ -83,18 +83,29 @@
         }
     };
 
-    function openModal(action) {
-        let confirmText = `Are you sure you wish to ${action} this GCE instance?`;
-        let confirmActions = `<button class="btn btn-light btn-sm" data-dismiss="modal">CANCEL</button><button class="btn btn-info btn-sm font-weight-bold" onclick="requestAction(this)">${action.toUpperCase()}</button>`;
-        $("#confirm_text").html(confirmText);
-        $("#confirm_actions").html(confirmActions);
+    function openModal(caller) {
+        $_caller = $(caller);
+        let action = $_caller.attr("data-action");
+        let targetVM = $_caller.attr("data-vm");
+
+        $("#confirm_text").html(`Are you sure you wish to ${action} <b>${targetVM}</b>?`);
+        $("#confirm_actions").html(`<button class="btn btn-light btn-sm" data-dismiss="modal">CANCEL</button>` + 
+        `<button class="btn btn-info btn-sm font-weight-bold" data-action="${action}" data-vm="${targetVM}" onclick="requestAction(this)">${action.toUpperCase()}</button>`);
+
         $("#confirm_modal").modal('show');
     }
 
     function requestAction(caller) {
-        if ($(caller).hasClass('disabled') == false) {
-            let action = $(caller).text().toLowerCase();
-            // TODO: Make the request to update the status of the VM
+        let $_caller = $(caller);
+        if ($_caller.hasClass('disabled') == false) {
+            let action = $_caller.attr("data-action");
+            let targetVM = $_caller.attr("data-vm");
+
+            requestManager.makeRequest({
+                url: `/instances/${targetVM}/${action}`
+            }, function(data) {
+                console.log(data);
+            });
         }
         addSpinnerToButton(caller);
     }

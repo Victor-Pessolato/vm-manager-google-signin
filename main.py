@@ -62,5 +62,18 @@ def get_instances(zone):
         return jsonify({'message': 'error'}), 401
 
 
+@app.route('/instances/<instance>/<action>', methods=['GET'])
+def update_instance(instance, action):
+    user_info = auth.authenticate(request)
+    if user_info:
+        if action == 'start':
+            return jsonify(compute.start_vm('us-central1-a', instance))
+        else:
+            return jsonify(compute.stop_vm('us-central1-a', instance))
+
+    else:
+        return jsonify({'message': 'error'}), 401
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
