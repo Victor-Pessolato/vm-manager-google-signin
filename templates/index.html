@@ -6,26 +6,26 @@
 	<meta name="google-signin-client_id" content="{{ gsignin_key }}">
 
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
-	<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+		integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 	<style>
 		.spinner-border-lg {
 			width: 4rem;
 			height: 4rem;
 		}
 
-        .pos-rel {
-            position: relative;
-        }
+		.pos-rel {
+			position: relative;
+		}
 
-        .btn-action {
-            position: absolute;
-            top: 1em;
-            right: 1em;
-        }
+		.btn-action {
+			position: absolute;
+			top: 1em;
+			right: 1em;
+		}
 	</style>
 </head>
 
@@ -56,47 +56,84 @@
 			</div>
 		</div>
 	</main>
+
+    <div class="modal fade" id="confirm_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="confirm_text" class="modal-body"></div>
+
+                <div id="confirm_actions" class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script src="{{ url_for('static', filename='script.js') }}"></script>
 	<script>
-        
+	
+    function openModal(action) {
+        let confirmText = `Are you sure you wish to ${action} this GCE instance?`;
+        let confirmActions = `<button class="btn btn-light btn-sm" data-dismiss="modal">CANCEL</button><button class="btn btn-info btn-sm font-weight-bold" onclick="requestAction(this)">${action.toUpperCase()}</button>`;
+        $("#confirm_text").html(confirmText);
+        $("#confirm_actions").html(confirmActions);
+        $("#confirm_modal").modal('show');
+    }
 
-        function getInstances(id_token) {
-            $_workspace = $("#main-workspace");
-            $_workspace.html(`<div id="workspace-spinner" class="spinner-border spinner-border-lg"></div>`);
-            $.ajax({
-                url: '/zones',
-                headers: { 'x-user-token': id_token }
-            }).done(function(data) {
-                if(data.zone_count > 0) {
-                    function getInstanceByZone() {
-                        let zone = data.zones.pop();
-                        console.log(zone);
-                        if(zone) {
-                            $.ajax({
-                                url: '/instances/' + zone.name,
-                                headers: { 'x-user-token': id_token }
-                            }).done(function(data) {
-                                // Display data
-                                if(!data.message) {
-                                    $_workspace.prepend(data);
-                                }                            
-                                // Continue handling the queue 
-                                getInstanceByZone();  
-                            });
-                        } else {
-                            $("#workspace-spinner").fadeOut();
-                        }
+    function requestAction(caller) {
+        if ($(caller).hasClass('disabled') == false) {
+            let action = $(caller).text().toLowerCase();
+            // TODO: Make the request to update the status of the VM
+        }
+        addSpinnerToButton(caller);
+    }
+
+    function addSpinnerToButton(target) {
+        $_target = $(target);
+        $_spinner = $_target.children(".spinner-border");
+        if ($_spinner.length <= 0) {
+            $_target.append(` <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+        } else {
+            $_spinner.show();
+        }
+        $_target.addClass('disabled');
+    }
+
+    function getInstances(id_token) {
+        $_workspace = $("#main-workspace");
+        $_workspace.html(`<div id="workspace-spinner" class="spinner-border spinner-border-lg"></div>`);
+        $.ajax({
+            url: '/zones',
+            headers: { 'x-user-token': id_token }
+        }).done(function(data) {
+            if(data.zone_count > 0) {
+                function getInstanceByZone() {
+                    let zone = data.zones.pop();
+                    if(zone) {
+                        $.ajax({
+                            url: '/instances/' + zone.name,
+                            headers: { 'x-user-token': id_token }
+                        }).done(function(data) {
+                            // Display data
+                            if(!data.message) {
+                                $_workspace.prepend(data);
+                            }                            
+                            // Continue handling the queue 
+                            getInstanceByZone();  
+                        });
+                    } else {
+                        $("#workspace-spinner").fadeOut();
                     }
-
-                    getInstanceByZone();
-
-                } else {
-                    $_workspace.html(`<h2 class="text-center">An error occured when trying to fetch GPC zones</h2>`);
                 }
 
-            });
+                getInstanceByZone();
+
+            } else {
+                $_workspace.html(`<h2 class="text-center">An error occured when trying to fetch GPC zones</h2>`);
+            }
+
+        });
     }
 
     function getUserData(id_token) {

@@ -7,9 +7,9 @@
                     <h4>{{ instance.name }}</h4>
                     Status:  
                     {% if instance.status == 'RUNNING' %}
-                        <span class="badge badge-success">{{ instance.status }}</span> <button class="btn btn-danger btn-sm btn-action" data-toggle="tooltip" title="Stop"><i class="fa fa-stop"></i></button>
+                        <span class="badge badge-success">{{ instance.status }}</span> <button class="btn btn-danger btn-sm btn-action" onclick="openModal('stop')" data-toggle="tooltip" title="Stop"><i class="fa fa-stop"></i></button>
                     {% else %}
-                        <span class="badge badge-danger">{{ instance.status }}</span> <button class="btn btn-success btn-sm btn-action" data-toggle="tooltip" title="Start"><i class="fas fa-play"></i></button>
+                        <span class="badge badge-danger">{{ instance.status }}</span> <button class="btn btn-success btn-sm btn-action" onclick="openModal('start')" data-toggle="tooltip" title="Start"><i class="fas fa-play"></i></button>
                     {% endif %}
                 </div>
             {% endfor %}
