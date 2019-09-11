@@ -40,7 +40,6 @@ def get_zones():
         # zones = compute.list_zones()
         # Uncomment in case I want to check for all the zones
         zones = db_manager.get_available_zones()
-        print(zones)
         zone_count = len(zones)
         return jsonify({'zones': zones, 'zone_count': zone_count})
     else:

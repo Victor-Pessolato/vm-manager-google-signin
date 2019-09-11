@@ -1,4 +1,14 @@
-body {
-  font-family: "helvetica", sans-serif;
-  text-align: center;
+.spinner-border-lg {
+    width: 4rem;
+    height: 4rem;
+}
+
+.pos-rel {
+    position: relative;
+}
+
+.btn-action {
+    position: absolute;
+    top: 1em;
+    right: 1em;
 }
