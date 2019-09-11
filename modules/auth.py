@@ -2,7 +2,7 @@ from flask import session
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
-from modules import user_manager
+from modules import db_manager
 
 google_signin_key = None
 
@@ -21,7 +21,7 @@ def identify(token):
 
 
 def authorize(user_info):
-    is_allowed = user_manager.is_allowed(user_info['email'])
+    is_allowed = db_manager.is_allowed(user_info['email'])
 
     if is_allowed:
         return user_info
@@ -47,7 +47,7 @@ def authenticate(request):
             session['user_info'] = user_info
 
         # We store is in the DB
-        user_manager.store_visitor(user_info)
+        db_manager.store_visitor(user_info)
         # And checks if user is authorized to proceed
         return authorize(user_info)
 

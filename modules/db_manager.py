@@ -29,3 +29,8 @@ def store_visitor(user_info):
     client.put(user)
 
     return True
+
+
+def get_available_zones():
+    query = client.query(kind='Zone')
+    return list(query.fetch())

@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, jsonify
 
-from modules import auth, compute
+from modules import auth, compute, db_manager
 
 app = Flask(__name__)
 
@@ -39,7 +39,8 @@ def get_zones():
     if user_info:
         # zones = compute.list_zones()
         # Uncomment in case I want to check for all the zones
-        zones = [{'name': 'us-central1-a'}]
+        zones = db_manager.get_available_zones()
+        print(zones)
         zone_count = len(zones)
         return jsonify({'zones': zones, 'zone_count': zone_count})
     else:
